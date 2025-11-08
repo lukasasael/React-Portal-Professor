@@ -1,11 +1,11 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { fakeLogin } from "../services/api";
+import { fakeLogin } from "../services/api"; // ✅ função que consulta o json-server
 
 type User = {
   id: number;
   email: string;
-  name?: string;
+  name: string;
 };
 
 type AuthContextType = {
@@ -24,18 +24,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
   const navigate = useNavigate();
 
+  // 🧠 Aqui está a sequência: chama API → guarda token → redireciona
   async function login(email: string, password: string) {
-    try {      
-      const response = await fakeLogin(email, password);
+    try {
+      const response = await fakeLogin(email, password); // 1️⃣ Chamada à API
 
       setUser(response.user);
       setToken(response.token);
 
+      // 2️⃣ Guarda o token no localStorage
       localStorage.setItem("token", response.token);
 
+      // 3️⃣ Redireciona pro dashboard
       navigate("/dashboard");
     } catch (err) {
-      alert("Credenciais inválidas ou erro de conexão com a API.");
+      alert("E-mail ou senha incorretos ou problema de conexão.");
     }
   }
 
