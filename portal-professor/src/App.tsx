@@ -1,24 +1,24 @@
-import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { Routes, Route, Navigate } from "react-router-dom";
+
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Alunos from "./pages/Alunos";
+import Turmas from "./pages/Turmas";
+import Avaliacoes from "./pages/Avaliacoes";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/alunos" element={<Alunos />} />
+        <Route path="/turmas" element={<Turmas />} />
+        <Route path="/avaliacoes" element={<Avaliacoes />} />
+        <Route path="*" element={<h2>Página não encontrada</h2>} />
+      </Routes>
     </div>
   );
 }
