@@ -1,7 +1,9 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+import { fakeLogin } from "../services/api";
 
 type User = {
+  id: number;
   email: string;
   name?: string;
 };
@@ -23,21 +25,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
 
   async function login(email: string, password: string) {
-    try {
-      // Simulação de API — substitua por uma chamada real (ex: axios.post)
-      if (email === "admin@teste.com" && password === "123456") {
-        const fakeToken = "fake-jwt-token";
-        const fakeUser = { email, name: "Administrador" };
+    try {      
+      const response = await fakeLogin(email, password);
 
-        setUser(fakeUser);
-        setToken(fakeToken);
-        localStorage.setItem("token", fakeToken);
-        navigate("/dashboard");
-      } else {
-        throw new Error("Credenciais inválidas");
-      }
+      setUser(response.user);
+      setToken(response.token);
+
+      localStorage.setItem("token", response.token);
+
+      navigate("/dashboard");
     } catch (err) {
-      alert("Erro ao fazer login: " + (err as Error).message);
+      alert("Credenciais inválidas ou erro de conexão com a API.");
     }
   }
 
@@ -55,7 +53,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Hook personalizado para usar o contexto com segurança
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
