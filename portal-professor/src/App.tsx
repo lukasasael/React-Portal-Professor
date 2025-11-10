@@ -5,46 +5,51 @@ import Alunos from "./pages/Alunos";
 import Turmas from "./pages/Turmas";
 import Avaliacoes from "./pages/Avaliacoes";
 import { PrivateRoute } from "./routes/PrivateRoute";
+import { Navbar } from "./components/Navbar"; // 👈 import aqui
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
+    <>
+      <Navbar /> {/* 👈 aparece em todas as páginas logadas */}
 
-      <Route
-        path="/dashboard"
-        element={
-          <PrivateRoute>
-            <Dashboard />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/alunos"
-        element={
-          <PrivateRoute>
-            <Alunos />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/turmas"
-        element={
-          <PrivateRoute>
-            <Turmas />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/avaliacoes"
-        element={
-          <PrivateRoute>
-            <Avaliacoes />
-          </PrivateRoute>
-        }
-      />
+      <Routes>
+        <Route path="/login" element={<Login />} />
 
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/alunos"
+          element={
+            <PrivateRoute>
+              <Alunos />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/turmas"
+          element={
+            <PrivateRoute>
+              <Turmas />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/avaliacoes"
+          element={
+            <PrivateRoute>
+              <Avaliacoes />
+            </PrivateRoute>
+          }
+        />
+
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </>
   );
 }
