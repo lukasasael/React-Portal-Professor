@@ -1,26 +1,50 @@
-import './App.css';
 import { Routes, Route, Navigate } from "react-router-dom";
-
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Alunos from "./pages/Alunos";
 import Turmas from "./pages/Turmas";
 import Avaliacoes from "./pages/Avaliacoes";
+import { PrivateRoute } from "./routes/PrivateRoute";
 
-function App() {
+export default function App() {
   return (
-    <div>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/alunos" element={<Alunos />} />
-        <Route path="/turmas" element={<Turmas />} />
-        <Route path="/avaliacoes" element={<Avaliacoes />} />
-        <Route path="*" element={<h2>Página não encontrada</h2>} />
-      </Routes>
-    </div>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+
+      <Route
+        path="/dashboard"
+        element={
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/alunos"
+        element={
+          <PrivateRoute>
+            <Alunos />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/turmas"
+        element={
+          <PrivateRoute>
+            <Turmas />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/avaliacoes"
+        element={
+          <PrivateRoute>
+            <Avaliacoes />
+          </PrivateRoute>
+        }
+      />
+
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
   );
 }
-
-export default App;

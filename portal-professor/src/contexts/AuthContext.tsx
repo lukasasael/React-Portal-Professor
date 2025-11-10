@@ -1,65 +1,68 @@
-import { createContext, useContext, useState, ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
-import { fakeLogin } from "../services/api"; // ✅ função que consulta o json-server
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 type User = {
-  id: number;
-  email: string;
   name: string;
+  email: string;
 };
 
 type AuthContextType = {
   user: User | null;
   token: string | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  loading: boolean;
 };
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(
-    localStorage.getItem("token")
-  );
-  const navigate = useNavigate();
+  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // 🧠 Aqui está a sequência: chama API → guarda token → redireciona
+  useEffect(() => {
+    const savedToken = localStorage.getItem("token");
+    const savedUser = localStorage.getItem("user");
+
+    if (savedToken && savedUser) {
+      setToken(savedToken);
+      setUser(JSON.parse(savedUser));
+    }
+
+    setLoading(false);
+  }, []);
+
   async function login(email: string, password: string) {
-    try {
-      const response = await fakeLogin(email, password); // 1️⃣ Chamada à API
+    if (email === "admin@teste.com" && password === "123456") {
+      const fakeToken = "abc123token";
+      const fakeUser = { name: "Administrador", email };
 
-      setUser(response.user);
-      setToken(response.token);
+      localStorage.setItem("token", fakeToken);
+      localStorage.setItem("user", JSON.stringify(fakeUser));
 
-      // 2️⃣ Guarda o token no localStorage
-      localStorage.setItem("token", response.token);
+      setToken(fakeToken);
+      setUser(fakeUser);
 
-      // 3️⃣ Redireciona pro dashboard
-      navigate("/dashboard");
-    } catch (err) {
-      alert("E-mail ou senha incorretos ou problema de conexão.");
+      return true; // ✅ indica sucesso
+    } else {
+      return false; // ❌ indica erro
     }
   }
 
   function logout() {
-    setUser(null);
-    setToken(null);
     localStorage.removeItem("token");
-    navigate("/login");
+    localStorage.removeItem("user");
+    setToken(null);
+    setUser(null);
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
-  }
-  return context;
+  return useContext(AuthContext);
 }
