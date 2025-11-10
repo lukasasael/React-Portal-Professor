@@ -52,6 +52,7 @@ export function AlunosView({
       </div>
 
       {/* 📋 Tabela */}
+      <div className="alunos-tabela-wrapper">
       <table className="alunos-tabela">
         <thead>
           <tr>
@@ -90,6 +91,7 @@ export function AlunosView({
           )}
         </tbody>
       </table>
+      </div>
 
       {/* ➕ Formulário */}
       <form onSubmit={onAddAluno} className="form-novo-aluno">

@@ -26,11 +26,18 @@ h1 {
   border-radius: 4px;
 }
 
-/* 📋 Tabela */
+.alunos-tabela-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; /* rolagem suave no iPhone */
+  margin-bottom: 20px;
+}
+
 .alunos-tabela {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 30px;
+  min-width: 700px; /* evita quebra de colunas */
 }
 
 .alunos-tabela th,
@@ -43,9 +50,27 @@ h1 {
 .alunos-tabela th {
   background-color: #f5f5f5;
   color: #1976d2;
-  font-weight: 600;
 }
 
+/* 🔹 no mobile */
+@media (max-width: 768px) {
+  .alunos-tabela-wrapper {
+    border-radius: 6px;
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .alunos-tabela {
+    min-width: 600px;
+  }
+
+  .alunos-tabela th,
+  .alunos-tabela td {
+    font-size: 14px;
+    padding: 8px 6px;
+  }
+}
+
+/* 🧾 Botões */
 .btn-editar,
 .btn-remover {
   border: none;
