@@ -36,7 +36,6 @@ type Props = {
             value={password}
             onChange={(e) => onChangePassword(e.target.value)}
             className="login-input"
-            required
           />
   
           {error && <p className="login-error">{error}</p>}

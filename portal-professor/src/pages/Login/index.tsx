@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { LoginView } from "./LoginView";
-import { useNavigate } from "react-router-dom"; // 👈 adicione
+import { useNavigate } from "react-router-dom";
 import "./styles.css";
 
 export default function Login() {
   const { login } = useAuth();
-  const navigate = useNavigate(); // 👈 adicionei isso
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,7 +21,7 @@ export default function Login() {
       const success = await login(email, password);
 
       if (success) {
-        navigate("/dashboard"); // 👈 redireciona após login bem-sucedido
+        navigate("/dashboard");
       } else {
         setError("E-mail ou senha incorretos.");
       }

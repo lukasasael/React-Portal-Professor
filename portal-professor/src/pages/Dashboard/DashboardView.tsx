@@ -1,8 +1,10 @@
-import { DashboardData } from "./index";
-
 type Props = {
-  user: { name?: string } | null;
-  dados: DashboardData | null;
+  user: { name: string; email: string } | null;
+  dados: {
+    totalAlunos: number;
+    totalTurmas: number;
+    proximasAvaliacoes: { nome: string; data: string }[];
+  } | null;
   onLogout: () => void;
 };
 

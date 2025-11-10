@@ -1,7 +1,8 @@
 {
     "users": [
       { "id": 1, "email": "admin@teste.com", "password": "123456", "name": "Administrador" },
-      { "id": 2, "email": "professor@escola.com", "password": "prof12", "name": "Professor" }
+      { "id": 2, "email": "professor@teste.com", "password": "123456", "name": "Professor" },
+      { "id": 3, "email": "professor2@teste.com", "password": "123456", "name": "Professor2" }
     ]
   }
   
