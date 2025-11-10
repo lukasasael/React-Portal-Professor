@@ -19,10 +19,20 @@ export default function Alunos() {
       : [
           { id: 1, nome: "Maria Silva", email: "maria@escola.com", turma: "1A", status: "Ativo" },
           { id: 2, nome: "João Santos", email: "joao@escola.com", turma: "2B", status: "Inativo" },
-          { id: 3, nome: "Ana Lima", email: "ana@escola.com", turma: "1A", status: "Ativo" },
         ];
   });
 
+  // 🔹 2. Carregar turmas disponíveis
+  const [turmas, setTurmas] = useState<{ id: number; nome: string }[]>([]);
+
+  useEffect(() => {
+    const data = localStorage.getItem("turmas");
+    if (data) {
+      setTurmas(JSON.parse(data));
+    }
+  }, []);
+
+  // 🔹 3. Atualizar alunos no localStorage
   useEffect(() => {
     localStorage.setItem("alunos", JSON.stringify(alunos));
   }, [alunos]);
@@ -36,16 +46,15 @@ export default function Alunos() {
   });
   const [modoEdicao, setModoEdicao] = useState<number | null>(null);
 
-  // 📘 Filtragem dinâmica
-  const alunosFiltrados = alunos.filter((a) => {
-    return (
+  // 📘 Filtragem
+  const alunosFiltrados = alunos.filter(
+    (a) =>
       a.nome.toLowerCase().includes(filtro.nome.toLowerCase()) &&
       a.turma.toLowerCase().includes(filtro.turma.toLowerCase()) &&
       (filtro.status === "" || a.status === filtro.status)
-    );
-  });
+  );
 
-  // ➕ Adicionar / Editar
+  // ➕ Adicionar / Editar aluno
   function handleAddAluno(e: React.FormEvent) {
     e.preventDefault();
     if (!novoAluno.nome || !novoAluno.email || !novoAluno.turma) return;
@@ -63,12 +72,10 @@ export default function Alunos() {
     setNovoAluno({ nome: "", email: "", turma: "", status: "Ativo" });
   }
 
-  // 🧹 Remover aluno
   function handleRemover(id: number) {
     setAlunos((prev) => prev.filter((a) => a.id !== id));
   }
 
-  // ✏️ Editar aluno
   function handleEditar(aluno: Aluno) {
     setNovoAluno(aluno);
     setModoEdicao(aluno.id);
@@ -80,6 +87,7 @@ export default function Alunos() {
       filtro={filtro}
       novoAluno={novoAluno}
       modoEdicao={modoEdicao}
+      turmas={turmas}
       onChangeFiltro={setFiltro}
       onChangeNovoAluno={setNovoAluno}
       onAddAluno={handleAddAluno}

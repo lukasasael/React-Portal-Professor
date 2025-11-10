@@ -3,12 +3,12 @@ import { Turma } from "./index";
 type Props = {
   turmas: Turma[];
   filtro: string;
-  novaTurma: Omit<Turma, "id">;
+  novaTurma: { nome: string; capacidade: number };
   modoEdicao: number | null;
-  onChangeFiltro: (valor: string) => void;
-  onChangeNovaTurma: (t: Omit<Turma, "id">) => void;
+  onChangeFiltro: (v: string) => void;
+  onChangeNovaTurma: (t: { nome: string; capacidade: number }) => void;
   onAddTurma: (e: React.FormEvent) => void;
-  onEditar: (t: Turma) => void;
+  onEditar: (turma: Turma) => void;
   onRemover: (id: number) => void;
 };
 
@@ -61,10 +61,7 @@ export function TurmasView({
                   <button onClick={() => onEditar(t)} className="btn-editar">
                     Editar
                   </button>
-                  <button
-                    onClick={() => onRemover(t.id)}
-                    className="btn-remover"
-                  >
+                  <button onClick={() => onRemover(t.id)} className="btn-remover">
                     Remover
                   </button>
                 </td>
@@ -82,9 +79,7 @@ export function TurmasView({
           type="text"
           placeholder="Nome"
           value={novaTurma.nome}
-          onChange={(e) =>
-            onChangeNovaTurma({ ...novaTurma, nome: e.target.value })
-          }
+          onChange={(e) => onChangeNovaTurma({ ...novaTurma, nome: e.target.value })}
           required
         />
         <input
@@ -92,22 +87,7 @@ export function TurmasView({
           placeholder="Capacidade"
           value={novaTurma.capacidade}
           onChange={(e) =>
-            onChangeNovaTurma({
-              ...novaTurma,
-              capacidade: Number(e.target.value),
-            })
-          }
-          required
-        />
-        <input
-          type="number"
-          placeholder="Qtd. de Alunos"
-          value={novaTurma.qtdAlunos}
-          onChange={(e) =>
-            onChangeNovaTurma({
-              ...novaTurma,
-              qtdAlunos: Number(e.target.value),
-            })
+            onChangeNovaTurma({ ...novaTurma, capacidade: Number(e.target.value) })
           }
           required
         />

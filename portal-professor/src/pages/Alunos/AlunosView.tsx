@@ -5,6 +5,7 @@ type Props = {
   filtro: { nome: string; turma: string; status: string };
   novoAluno: Omit<Aluno, "id">;
   modoEdicao: number | null;
+  turmas: { id: number; nome: string }[];
   onChangeFiltro: (f: { nome: string; turma: string; status: string }) => void;
   onChangeNovoAluno: (a: Omit<Aluno, "id">) => void;
   onAddAluno: (e: React.FormEvent) => void;
@@ -17,6 +18,7 @@ export function AlunosView({
   filtro,
   novoAluno,
   modoEdicao,
+  turmas,
   onChangeFiltro,
   onChangeNovoAluno,
   onAddAluno,
@@ -52,7 +54,6 @@ export function AlunosView({
       </div>
 
       {/* 📋 Tabela */}
-      <div className="alunos-tabela-wrapper">
       <table className="alunos-tabela">
         <thead>
           <tr>
@@ -91,7 +92,6 @@ export function AlunosView({
           )}
         </tbody>
       </table>
-      </div>
 
       {/* ➕ Formulário */}
       <form onSubmit={onAddAluno} className="form-novo-aluno">
@@ -106,6 +106,7 @@ export function AlunosView({
           }
           required
         />
+
         <input
           type="email"
           placeholder="E-mail"
@@ -115,15 +116,23 @@ export function AlunosView({
           }
           required
         />
-        <input
-          type="text"
-          placeholder="Turma"
+
+        {/* 🔽 Turmas disponíveis */}
+        <select
           value={novoAluno.turma}
           onChange={(e) =>
             onChangeNovoAluno({ ...novoAluno, turma: e.target.value })
           }
           required
-        />
+        >
+          <option value="">Selecione uma turma</option>
+          {turmas.map((t) => (
+            <option key={t.id} value={t.nome}>
+              {t.nome}
+            </option>
+          ))}
+        </select>
+
         <select
           value={novoAluno.status}
           onChange={(e) =>

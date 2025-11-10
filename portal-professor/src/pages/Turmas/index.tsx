@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { TurmasView } from "./TurmasView";
 import "./styles.css";
 
@@ -21,49 +21,40 @@ export default function Turmas() {
         ];
   });
 
-  // 🔹 Salva no localStorage sempre que mudar
-  useEffect(() => {
-    localStorage.setItem("turmas", JSON.stringify(turmas));
-  }, [turmas]);
-
-  // 🔹 Atualiza automaticamente a quantidade de alunos
-  useEffect(() => {
+  // 🔹 Atualiza quantidade de alunos por turma
+  function atualizarQtdAlunos() {
     const dataAlunos = localStorage.getItem("alunos");
     if (!dataAlunos) return;
 
     const alunos = JSON.parse(dataAlunos);
-    const turmasAtualizadas = turmas.map((t) => {
-      const qtd = alunos.filter((a: any) => a.turma === t.nome).length;
-      return { ...t, qtdAlunos: qtd };
-    });
+    setTurmas((prev) =>
+      prev.map((t) => ({
+        ...t,
+        qtdAlunos: alunos.filter((a: any) => a.turma === t.nome).length,
+      }))
+    );
+  }
 
-    setTurmas(turmasAtualizadas);
-  }, []);
-
-  // 🔹 Atualiza quando houver mudança em "alunos" no localStorage
+  // 🔹 Carrega alunos ao montar
   useEffect(() => {
-    function syncTurmas() {
-      const dataAlunos = localStorage.getItem("alunos");
-      if (!dataAlunos) return;
-
-      const alunos = JSON.parse(dataAlunos);
-      setTurmas((prev) =>
-        prev.map((t) => ({
-          ...t,
-          qtdAlunos: alunos.filter((a: any) => a.turma === t.nome).length,
-        }))
-      );
-    }
-
-    window.addEventListener("storage", syncTurmas);
-    return () => window.removeEventListener("storage", syncTurmas);
+    atualizarQtdAlunos();
   }, []);
+
+  // 🔹 Atualiza automaticamente se alunos forem alterados
+  useEffect(() => {
+    window.addEventListener("storage", atualizarQtdAlunos);
+    return () => window.removeEventListener("storage", atualizarQtdAlunos);
+  }, []);
+
+  // 🔹 Salva turmas sempre que mudar
+  useEffect(() => {
+    localStorage.setItem("turmas", JSON.stringify(turmas));
+  }, [turmas]);
 
   const [filtro, setFiltro] = useState("");
-  const [novaTurma, setNovaTurma] = useState<Omit<Turma, "id">>({
+  const [novaTurma, setNovaTurma] = useState<Omit<Turma, "id" | "qtdAlunos">>({
     nome: "",
     capacidade: 0,
-    qtdAlunos: 0,
   });
   const [modoEdicao, setModoEdicao] = useState<number | null>(null);
 
@@ -71,22 +62,24 @@ export default function Turmas() {
     t.nome.toLowerCase().includes(filtro.toLowerCase())
   );
 
-  // ➕ Adicionar / Editar
+  // ➕ Adicionar ou editar turma
   function handleAddTurma(e: React.FormEvent) {
     e.preventDefault();
     if (!novaTurma.nome) return;
 
     if (modoEdicao) {
       setTurmas((prev) =>
-        prev.map((t) => (t.id === modoEdicao ? { ...t, ...novaTurma } : t))
+        prev.map((t) =>
+          t.id === modoEdicao ? { ...t, nome: novaTurma.nome, capacidade: novaTurma.capacidade } : t
+        )
       );
       setModoEdicao(null);
     } else {
-      const nova = { ...novaTurma, id: Date.now() };
+      const nova = { ...novaTurma, id: Date.now(), qtdAlunos: 0 };
       setTurmas((prev) => [...prev, nova]);
     }
 
-    setNovaTurma({ nome: "", capacidade: 0, qtdAlunos: 0 });
+    setNovaTurma({ nome: "", capacidade: 0 });
   }
 
   // 🧹 Remover turma
@@ -96,7 +89,7 @@ export default function Turmas() {
 
   // ✏️ Editar turma
   function handleEditar(turma: Turma) {
-    setNovaTurma(turma);
+    setNovaTurma({ nome: turma.nome, capacidade: turma.capacidade });
     setModoEdicao(turma.id);
   }
 
