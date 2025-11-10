@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import "./index.css";
+import { LoginView } from "./LoginView";
+import "./styles.css";
 
 export default function Login() {
   const { login } = useAuth();
@@ -16,7 +17,7 @@ export default function Login() {
 
     try {
       await login(email, password);
-    } catch (err) {
+    } catch {
       setError("E-mail ou senha incorretos.");
     } finally {
       setLoading(false);
@@ -24,33 +25,14 @@ export default function Login() {
   }
 
   return (
-    <div className="login-container">
-      <h2>Portal do Professor</h2>
-      <form onSubmit={handleSubmit} className="login-form">
-        <input
-          type="email"
-          placeholder="E-mail"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="login-input"
-          required
-        />
-
-        <input
-          type="password"
-          placeholder="Senha"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="login-input"
-          required
-        />
-
-        {error && <p className="login-error">{error}</p>}
-
-        <button type="submit" className="login-button" disabled={loading}>
-          {loading ? "Entrando..." : "Entrar"}
-        </button>
-      </form>
-    </div>
+    <LoginView
+      email={email}
+      password={password}
+      loading={loading}
+      error={error}
+      onChangeEmail={setEmail}
+      onChangePassword={setPassword}
+      onSubmit={handleSubmit}
+    />
   );
 }
