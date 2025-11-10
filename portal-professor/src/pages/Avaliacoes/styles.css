@@ -98,4 +98,25 @@
     margin-top: 15px;
     font-size: 16px;
   }
+
+  .btn-editar {
+  background-color: #ffb300;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+.btn-cancelar {
+  background-color: #999;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
   

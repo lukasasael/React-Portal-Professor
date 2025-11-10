@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { AvaliacoesView } from "./AvaliacoesView";
+import { TabelaAvaliacoes } from "./TabelaAvaliacoes";
 import "./styles.css";
 
 type Criterio = {
@@ -8,12 +9,19 @@ type Criterio = {
   peso: number;
 };
 
+type Avaliacao = {
+  id: number;
+  nome: string;
+  data: string;
+  turma: string;
+  criterios: Criterio[];
+};
+
 export default function Avaliacoes() {
   const [turmas, setTurmas] = useState<string[]>([]);
-  const [turmaSelecionada, setTurmaSelecionada] = useState<string>("");
-  const [criterios, setCriterios] = useState<Criterio[]>([]);
-  const [alerta, setAlerta] = useState("");
-  const [mensagemSalvo, setMensagemSalvo] = useState("");
+  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
+  const [modoFormulario, setModoFormulario] = useState<"lista" | "form">("lista");
+  const [avaliacaoAtual, setAvaliacaoAtual] = useState<Avaliacao | null>(null);
 
   // Carrega turmas
   useEffect(() => {
@@ -21,79 +29,95 @@ export default function Avaliacoes() {
     if (data) {
       const lista = JSON.parse(data);
       setTurmas(lista.map((t: any) => t.nome));
-      setTurmaSelecionada(lista[0]?.nome || "");
     }
   }, []);
 
-  // Carrega critérios por turma
+  // Carrega avaliações
   useEffect(() => {
-    if (!turmaSelecionada) return;
-    const data = localStorage.getItem("avaliacoesPorTurma");
-    const avaliacoes = data ? JSON.parse(data) : {};
-    setCriterios(
-      avaliacoes[turmaSelecionada] || [
+    const data = localStorage.getItem("avaliacoes");
+    if (data) {
+      setAvaliacoes(JSON.parse(data));
+    }
+  }, []);
+
+  // Salva avaliações
+  const salvarAvaliacoes = (lista: Avaliacao[]) => {
+    localStorage.setItem("avaliacoes", JSON.stringify(lista));
+    setAvaliacoes(lista);
+  };
+
+  // Adicionar nova avaliação
+  const handleAdicionar = () => {
+    setAvaliacaoAtual({
+      id: Date.now(),
+      nome: `Avaliação ${avaliacoes.length + 1}`,
+      data: new Date().toISOString().substring(0, 10),
+      turma: turmas[0] || "",
+      criterios: [
         { id: 1, nome: "Prova 1", peso: 40 },
         { id: 2, nome: "Trabalho", peso: 30 },
         { id: 3, nome: "Participação", peso: 30 },
-      ]
-    );
-  }, [turmaSelecionada]);
-
-  // Atualiza soma dos pesos e salva
-  useEffect(() => {
-    if (!turmaSelecionada) return;
-    const soma = criterios.reduce((acc, c) => acc + c.peso, 0);
-
-    if (soma > 100) setAlerta(`⚠️ Soma dos pesos excede 100% (${soma}%)`);
-    else if (soma < 100) setAlerta(`ℹ️ Soma dos pesos é menor que 100% (${soma}%)`);
-    else setAlerta("");
-
-    const data = localStorage.getItem("avaliacoesPorTurma");
-    const avaliacoes = data ? JSON.parse(data) : {};
-    avaliacoes[turmaSelecionada] = criterios;
-    localStorage.setItem("avaliacoesPorTurma", JSON.stringify(avaliacoes));
-  }, [criterios, turmaSelecionada]);
-
-  // Funções
-  const handlePesoChange = (id: number, valor: number) =>
-    setCriterios((prev) => prev.map((c) => (c.id === id ? { ...c, peso: valor } : c)));
-
-  const handleNomeChange = (id: number, valor: string) =>
-    setCriterios((prev) => prev.map((c) => (c.id === id ? { ...c, nome: valor } : c)));
-
-  const handleAddCriterio = () =>
-    setCriterios((prev) => [
-      ...prev,
-      { id: Date.now(), nome: `Novo Critério ${prev.length + 1}`, peso: 0 },
-    ]);
-
-  const handleRemover = (id: number) =>
-    setCriterios((prev) => prev.filter((c) => c.id !== id));
-
-  const handleSalvar = () => {
-    const data = localStorage.getItem("avaliacoesPorTurma");
-    const avaliacoes = data ? JSON.parse(data) : {};
-    avaliacoes[turmaSelecionada] = criterios;
-    localStorage.setItem("avaliacoesPorTurma", JSON.stringify(avaliacoes));
-
-    setMensagemSalvo("✅ Dados salvos com sucesso!");
-    setTimeout(() => setMensagemSalvo(""), 2500);
-    setTimeout(() => window.location.reload(), 800);
+      ],
+    });
+    setModoFormulario("form");
   };
 
+  // Editar avaliação existente
+  // Editar avaliação existente
+const handleEditar = (id: number) => {
+  const avaliacao = avaliacoes.find((a) => a.id === id);
+  if (avaliacao) {
+    // 🩹 Garante que sempre exista um array de critérios
+    if (!avaliacao.criterios) {
+      avaliacao.criterios = [
+        { id: 1, nome: "Prova 1", peso: 40 },
+        { id: 2, nome: "Trabalho", peso: 30 },
+        { id: 3, nome: "Participação", peso: 30 },
+      ];
+    }
+
+    setAvaliacaoAtual(avaliacao);
+    setModoFormulario("form");
+  }
+};
+
+
+  // Excluir avaliação
+  const handleExcluir = (id: number) => {
+    if (window.confirm("Deseja realmente excluir esta avaliação?")) {
+      const novas = avaliacoes.filter((a) => a.id !== id);
+      salvarAvaliacoes(novas);
+    }
+  };
+
+  // Salvar dados do formulário
+  const handleSalvarFormulario = (avaliacaoAtualizada: Avaliacao) => {
+    const existentes = avaliacoes.filter((a) => a.id !== avaliacaoAtualizada.id);
+    const novas = [...existentes, avaliacaoAtualizada];
+    salvarAvaliacoes(novas);
+    setModoFormulario("lista");
+  };
+
+  // Cancelar e voltar
+  const handleCancelar = () => setModoFormulario("lista");
+
   return (
-    <AvaliacoesView
-      turmas={turmas}
-      turmaSelecionada={turmaSelecionada}
-      criterios={criterios}
-      alerta={alerta}
-      mensagemSalvo={mensagemSalvo}
-      onSelectTurma={setTurmaSelecionada}
-      onPesoChange={handlePesoChange}
-      onNomeChange={handleNomeChange}
-      onAddCriterio={handleAddCriterio}
-      onRemover={handleRemover}
-      onSalvar={handleSalvar}
-    />
+    <div className="avaliacoes-container">
+      {modoFormulario === "lista" ? (
+        <TabelaAvaliacoes
+          avaliacoes={avaliacoes}
+          onAdicionar={handleAdicionar}
+          onEditar={handleEditar}
+          onExcluir={handleExcluir}
+        />
+      ) : avaliacaoAtual ? (
+        <AvaliacoesView
+          turmas={turmas}
+          avaliacao={avaliacaoAtual}
+          onSalvar={handleSalvarFormulario}
+          onCancelar={handleCancelar}
+        />
+      ) : null}
+    </div>
   );
 }
