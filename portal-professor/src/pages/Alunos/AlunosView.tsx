@@ -54,44 +54,44 @@ export function AlunosView({
       </div>
 
       {/* 📋 Tabela */}
-      <table className="alunos-tabela">
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>E-mail</th>
-            <th>Turma</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {alunos.length === 0 ? (
+      <div className="alunos-tabela-wrapper">
+        <table className="alunos-tabela">
+          <thead>
             <tr>
-              <td colSpan={5}>Nenhum aluno encontrado.</td>
-            </tr>
-          ) : (
-            alunos.map((a) => (
-              <tr key={a.id}>
-                <td>{a.nome}</td>
-                <td>{a.email}</td>
-                <td>{a.turma}</td>
-                <td>{a.status}</td>
-                <td>
-                  <button onClick={() => onEditar(a)} className="btn-editar">
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => onRemover(a.id)}
-                    className="btn-remover"
-                  >
-                    Remover
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Turma</th>
+              <th>Status</th>
+              <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {alunos.length === 0 ? (
+        <tr>
+          <td colSpan={5}>Nenhum aluno encontrado.</td>
+        </tr>
+      ) : (
+        alunos.map((a) => (
+          <tr key={a.id}>
+            <td>{a.nome}</td>
+            <td>{a.email}</td>
+            <td>{a.turma}</td>
+            <td>{a.status}</td>
+            <td>
+              <button onClick={() => onEditar(a)} className="btn-editar">
+                Editar
+              </button>
+              <button onClick={() => onRemover(a.id)} className="btn-remover">
+                Remover
+              </button>
+            </td>
+          </tr>
+        ))
+      )}
+    </tbody>
+  </table>
+</div>
+
 
       {/* ➕ Formulário */}
       <form onSubmit={onAddAluno} className="form-novo-aluno">
