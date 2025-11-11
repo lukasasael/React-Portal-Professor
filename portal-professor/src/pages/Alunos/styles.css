@@ -231,13 +231,13 @@ h1 {
     font-size: 1rem;
   }
 
-  .alunos-tabela-wrapper {
-    border-radius: 6px;
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.08);
+  .alunos-tabela {
+    width: max-content; /* ✅ força o scroll apenas em telas pequenas */
+    min-width: 650px;
   }
 
-  .alunos-tabela {
-    min-width: 600px;
+  .alunos-tabela-wrapper {
+    overflow-x: auto;
   }
 
   .alunos-tabela th,
@@ -290,42 +290,39 @@ html, body {
   overflow-x: hidden;
 }
 
-/* 🔹 Wrapper da tabela: onde o scroll deve existir */
+/* ==========================
+   📋 TABELA DE ALUNOS
+========================== */
 .alunos-tabela-wrapper {
   width: 100%;
-  overflow-x: auto; /* Scroll horizontal aqui */
-  overflow-y: hidden;
+  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   margin-bottom: 20px;
-  border-radius: 8px;
-  background-color: #fff;
-  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.05);
 }
 
-/* A tabela deve ter largura mínima para forçar o scroll */
 .alunos-tabela {
+  width: 100%;
   border-collapse: collapse;
-  width: max-content; /* 🔹 permite que o conteúdo defina a largura */
-  min-width: 700px;   /* 🔹 evita quebra no mobile */
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-/* Células */
 .alunos-tabela th,
 .alunos-tabela td {
   border: 1px solid #ddd;
-  padding: 10px;
+  padding: 12px 10px;
   text-align: center;
-  white-space: nowrap; /* impede quebra de texto dentro das colunas */
+  font-size: 0.95rem;
+  white-space: nowrap;
 }
 
-/* Cabeçalho */
 .alunos-tabela th {
   background-color: #f5f5f5;
   color: #1976d2;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+  font-weight: 600;
 }
+
 
 /* Remove scroll global */
 html, body {

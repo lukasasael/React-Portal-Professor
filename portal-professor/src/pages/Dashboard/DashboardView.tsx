@@ -39,15 +39,24 @@ export function DashboardView({ user, dados, onLogout }: Props) {
 
         <div className="card avaliacoes">
           <h2>Próximas Avaliações</h2>
+          {dados.proximasAvaliacoes.length === 0 ? (
+            <p>🎉 Nenhuma avaliação futura agendada.</p>
+          ) : (
           <ul>
             {dados.proximasAvaliacoes.map((av, i) => (
               <li key={i}>
-                <strong>{av.nome}</strong> –{" "}
-                {new Date(av.data).toLocaleDateString("pt-BR")}
+                <strong>{av.nome}</strong> —{" "}
+                {(() => {
+                  const [ano, mes, dia] = av.data.split("-");
+                  return `${dia}/${mes}/${ano}`;
+                })()}
+
               </li>
             ))}
           </ul>
+          )}
         </div>
+
       </main>
     </div>
   );

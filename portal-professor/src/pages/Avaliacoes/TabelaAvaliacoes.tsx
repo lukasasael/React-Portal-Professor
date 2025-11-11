@@ -1,11 +1,5 @@
 import React from "react";
-
-type Avaliacao = {
-  id: number;
-  nome: string;
-  data: string;
-  turma: string;
-};
+import type { Avaliacao } from "./types"; // ajuste para o path correto do seu types.ts
 
 type Props = {
   avaliacoes: Avaliacao[];
@@ -14,18 +8,23 @@ type Props = {
   onExcluir: (id: number) => void;
 };
 
-export function TabelaAvaliacoes({ avaliacoes, onAdicionar, onEditar, onExcluir }: Props) {
-    function formatarData(dataISO: string) {
-        if (!dataISO) return "";
-        const [ano, mes, dia] = dataISO.split("-");
-        return `${dia}/${mes}/${ano}`;
-    }
+export function TabelaAvaliacoes({
+  avaliacoes,
+  onAdicionar,
+  onEditar,
+  onExcluir,
+}: Props) {
+  function formatarData(dataISO: string) {
+    if (!dataISO) return "";
+    const [ano, mes, dia] = dataISO.split("-");
+    return `${dia}/${mes}/${ano}`;
+  }
 
-    return (
+  return (
     <div>
-      <h1>📘 Lista de Avaliações</h1>
+      <h1>Lista de Avaliações</h1>
 
-      <button onClick={onAdicionar} className="btn-adicionar">
+      <button type="button" onClick={onAdicionar} className="btn-adicionar">
         ➕ Adicionar Avaliação
       </button>
 
@@ -50,10 +49,25 @@ export function TabelaAvaliacoes({ avaliacoes, onAdicionar, onEditar, onExcluir 
                 <td>{formatarData(a.data)}</td>
                 <td>{a.turma}</td>
                 <td>
-                  <button onClick={() => onEditar(a.id)} className="btn-editar">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      console.log("[TabelaAvaliacoes] editar clicado:", a.id);
+                      onEditar(a.id);
+                    }}
+                    className="btn-editar"
+                  >
                     Editar
                   </button>
-                  <button onClick={() => onExcluir(a.id)} className="btn-remover">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      console.log("[TabelaAvaliacoes] excluir clicado:", a.id);
+                      onExcluir(a.id);
+                    }}
+                    className="btn-remover"
+                    style={{ marginLeft: 8 }}
+                  >
                     Excluir
                   </button>
                 </td>

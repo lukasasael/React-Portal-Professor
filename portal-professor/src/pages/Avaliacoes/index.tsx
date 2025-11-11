@@ -2,20 +2,7 @@ import { useState, useEffect } from "react";
 import { AvaliacoesView } from "./AvaliacoesView";
 import { TabelaAvaliacoes } from "./TabelaAvaliacoes";
 import "./styles.css";
-
-type Criterio = {
-  id: number;
-  nome: string;
-  peso: number;
-};
-
-type Avaliacao = {
-  id: number;
-  nome: string;
-  data: string;
-  turma: string;
-  criterios: Criterio[];
-};
+import type { Avaliacao } from "./types";
 
 export default function Avaliacoes() {
   const [turmas, setTurmas] = useState<string[]>([]);
@@ -23,32 +10,47 @@ export default function Avaliacoes() {
   const [modoFormulario, setModoFormulario] = useState<"lista" | "form">("lista");
   const [avaliacaoAtual, setAvaliacaoAtual] = useState<Avaliacao | null>(null);
 
-  // Carrega turmas
   useEffect(() => {
     const data = localStorage.getItem("turmas");
     if (data) {
-      const lista = JSON.parse(data);
-      setTurmas(lista.map((t: any) => t.nome));
+      try {
+        const lista = JSON.parse(data);
+        setTurmas(lista.map((t: any) => t.nome));
+      } catch (err) {
+        console.error("Erro ao parsear turmas", err);
+      }
     }
   }, []);
 
-  // Carrega avaliações
+  // 🧩 Corrige carregamento de IDs (garante que sejam números)
   useEffect(() => {
     const data = localStorage.getItem("avaliacoes");
     if (data) {
-      setAvaliacoes(JSON.parse(data));
+      try {
+        const lista = JSON.parse(data).map((a: any) => ({
+          ...a,
+          id: Number(a.id),
+        }));
+        setAvaliacoes(lista);
+      } catch (err) {
+        console.error("Erro ao parsear avaliacoes", err);
+        setAvaliacoes([]);
+      }
     }
   }, []);
 
-  // Salva avaliações
   const salvarAvaliacoes = (lista: Avaliacao[]) => {
-    localStorage.setItem("avaliacoes", JSON.stringify(lista));
-    setAvaliacoes(lista);
+    try {
+      localStorage.setItem("avaliacoes", JSON.stringify(lista));
+      setAvaliacoes(lista);
+      window.dispatchEvent(new CustomEvent("avaliacoes:updated"));
+    } catch (err) {
+      console.error("Erro ao salvar avaliacoes", err);
+    }
   };
 
-  // Adicionar nova avaliação
   const handleAdicionar = () => {
-    setAvaliacaoAtual({
+    const nova: Avaliacao = {
       id: Date.now(),
       nome: `Avaliação ${avaliacoes.length + 1}`,
       data: new Date().toISOString().substring(0, 10),
@@ -58,48 +60,67 @@ export default function Avaliacoes() {
         { id: 2, nome: "Trabalho", peso: 30 },
         { id: 3, nome: "Participação", peso: 30 },
       ],
-    });
+    };
+    setAvaliacaoAtual(nova);
     setModoFormulario("form");
   };
 
-  // Editar avaliação existente
-  // Editar avaliação existente
-const handleEditar = (id: number) => {
-  const avaliacao = avaliacoes.find((a) => a.id === id);
-  if (avaliacao) {
-    // 🩹 Garante que sempre exista um array de critérios
-    if (!avaliacao.criterios) {
-      avaliacao.criterios = [
-        { id: 1, nome: "Prova 1", peso: 40 },
-        { id: 2, nome: "Trabalho", peso: 30 },
-        { id: 3, nome: "Participação", peso: 30 },
-      ];
+  const handleEditar = (id: number) => {
+    console.log("[Avaliacoes] editar recebido:", id);
+    const avaliacao = avaliacoes.find((a) => a.id === id);
+    if (avaliacao) {
+      if (!avaliacao.criterios) {
+        avaliacao.criterios = [
+          { id: 1, nome: "Prova 1", peso: 40 },
+          { id: 2, nome: "Trabalho", peso: 30 },
+          { id: 3, nome: "Participação", peso: 30 },
+        ];
+      }
+      setAvaliacaoAtual({ ...avaliacao });
+      setModoFormulario("form");
     }
-
-    setAvaliacaoAtual(avaliacao);
-    setModoFormulario("form");
   }
-};
 
-
-  // Excluir avaliação
   const handleExcluir = (id: number) => {
-    if (window.confirm("Deseja realmente excluir esta avaliação?")) {
-      const novas = avaliacoes.filter((a) => a.id !== id);
-      salvarAvaliacoes(novas);
-    }
+  console.log("[Avaliacoes] excluir recebido:", id);
+
+  const atual = JSON.parse(localStorage.getItem("avaliacoes") || "[]");
+  const filtradas = atual.filter((a: any) => Number(a.id) !== Number(id));
+
+  if (filtradas.length === atual.length) {
+    return;
+  } 
+  localStorage.setItem("avaliacoes", JSON.stringify(filtradas));
+  setAvaliacoes(filtradas);
+  window.dispatchEvent(new Event("avaliacoes:updated"));
   };
 
-  // Salvar dados do formulário
+
   const handleSalvarFormulario = (avaliacaoAtualizada: Avaliacao) => {
-    const existentes = avaliacoes.filter((a) => a.id !== avaliacaoAtualizada.id);
-    const novas = [...existentes, avaliacaoAtualizada];
+    const novas = [
+      ...avaliacoes.filter((a) => Number(a.id) !== Number(avaliacaoAtualizada.id)),
+      avaliacaoAtualizada,
+    ];
     salvarAvaliacoes(novas);
     setModoFormulario("lista");
   };
 
-  // Cancelar e voltar
   const handleCancelar = () => setModoFormulario("lista");
+
+  useEffect(() => {
+    function atualizar() {
+      const d = localStorage.getItem("avaliacoes");
+      if (d) {
+        setAvaliacoes(JSON.parse(d));
+      }
+    }
+    window.addEventListener("avaliacoes:updated", atualizar);
+    window.addEventListener("storage", atualizar);
+    return () => {
+      window.removeEventListener("avaliacoes:updated", atualizar);
+      window.removeEventListener("storage", atualizar);
+    };
+  }, []);
 
   return (
     <div className="avaliacoes-container">

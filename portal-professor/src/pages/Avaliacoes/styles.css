@@ -52,13 +52,19 @@
   }
   
   .btn-remover {
-    background-color: #e53935;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 5px 10px;
-    cursor: pointer;
-  }
+  background-color: #e53935;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-remover:hover {
+  background-color: #c62828;
+}
+
   
   .btn-adicionar {
     background-color: #1976d2;
